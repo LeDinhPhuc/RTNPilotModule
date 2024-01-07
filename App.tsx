@@ -5,113 +5,72 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useRef} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
   useColorScheme,
-  View,
 } from 'react-native';
+// @ts-ignore
+import Video, {VideoRef} from 'react-native-video';
+import MultiCDN from './modules/MultiCDN';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const SECURITY_TOKEN = 'a73dade4e0e923d62b427e746369a7';
+const PROPERTY_ID = 'DEMO_DASH';
+const ORIGIN_URL =
+  'https://live-on-v2-akm.akamaized.net/manifest/test_live/master.m3u8';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+MultiCDN.initPilot(SECURITY_TOKEN);
 
-function Section({children, title}: SectionProps): React.JSX.Element {
+function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  const videoRef = useRef<VideoRef>(null);
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const url = MultiCDN.generateUrl(ORIGIN_URL, PROPERTY_ID);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  console.log('url ', url);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <SafeAreaView style={{flex: 1, flexDirection: 'row'}}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <Video
+        source={{
+          uri: MultiCDN.generateUrl(ORIGIN_URL, PROPERTY_ID),
+          type: 'm3u8',
+        }}
+        ref={videoRef} // Store reference
+        key="video-player"
+        // onBuffer={this.onBuffer} // Callback when remote video is buffering
+        // onError={this.videoError} // Callback when video cannot be loaded
+        // onProgress={this.onProgress}
+        // onLoadStart={this.onLoad}
+        controls={true}
+        resizeMode="contain"
+        // fullscreen={true}
+        style={styles.backgroundVideo}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  backgroundVideo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  btnAnalytic: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 120,
+    height: 30,
+    borderRadius: 2,
+    backgroundColor: '#2bc4e3',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 176, 173, 0.5)',
   },
 });
 
